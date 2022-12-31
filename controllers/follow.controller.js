@@ -65,9 +65,9 @@ const getFollowers = async (req, res) => {
                     $project: {
                         _id: "$by._id",
                         name: "$by.name",
-                        dp: "$by.dp",
-                        dob: "$by.dob",
-                        about: "$by.about",
+                        // dp: "$by.dp",
+                        // dob: "$by.dob",
+                        // about: "$by.about",
                         gender: "$by.gender",
                     }
                 },
@@ -110,9 +110,9 @@ const getFollowings = async (req, res) => {
                     $project: {
                         _id: "$to._id",
                         name: "$to.name",
-                        dp: "$to.dp",
-                        dob: "$to.dob",
-                        about: "$to.about",
+                        // dp: "$to.dp",
+                        // dob: "$to.dob",
+                        // about: "$to.about",
                         gender: "$to.gender"
                     }
                 },

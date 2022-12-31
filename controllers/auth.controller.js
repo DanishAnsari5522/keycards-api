@@ -82,7 +82,7 @@ const sendOtp = async (req, res, data, action) => {
         requireTLS: true,
         auth: {
             user: 'dsdanishansari1117@gmail.com',
-            pass: 'memppgtgladvrcmv'
+            pass: ''
         }
     })
     var mailOptions = {
