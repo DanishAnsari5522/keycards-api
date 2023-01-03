@@ -82,7 +82,7 @@ const sendOtp = async (req, res, data, action) => {
         requireTLS: true,
         auth: {
             user: 'dsdanishansari1117@gmail.com',
-            pass: ''
+            pass: 'memppgtgladvrcmv'
         }
     })
     var mailOptions = {
@@ -95,7 +95,9 @@ const sendOtp = async (req, res, data, action) => {
         if (error) {
             console.log(error);
         } else {
-            console.log("mail has been send", info.response);
+            // console.log("mail has been send", info.response);
+        return res.status(200).json({ success: true, message: "otp send" })
+
         }
     })
 }

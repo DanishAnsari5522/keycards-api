@@ -83,6 +83,7 @@ const liveSearch = async (req, res) => {
 
         const data = await user.find({ name: { $regex: '^' + name, $options: 'i' } }).select("name dp gender _id ").sort({ datetime: -1 }).skip(skip).limit(20)
         res.status(200).json({ success: true, data })
+        console.log(data);
     } catch (error) {
         res.status(500).json({ success: false, message: "server error" })
     }
