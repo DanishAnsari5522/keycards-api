@@ -23,7 +23,6 @@ const getLoggedInUserInfo = async (req, res) => {
                 success: true, data: {
                     _id: data._id,
                     name: data.name,
-                    // dp: data.dp,
                     email: data.email,
                     phone: data.phone,
                     gender: data.gender,
