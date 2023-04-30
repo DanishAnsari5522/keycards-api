@@ -57,7 +57,7 @@ const getFollowers = async (req, res) => {
             const followers = await follow.aggregate([
                 { $match: { to: _id } },
                 { $sort: { datetime: -1 } },
-                { $skip: skip },
+                // { $skip: skip },
                 { $limit: 20 },
                 { $lookup: { from: 'users', localField: 'by', foreignField: '_id', as: 'by' } },
                 { $unwind: '$by' },
@@ -65,9 +65,6 @@ const getFollowers = async (req, res) => {
                     $project: {
                         _id: "$by._id",
                         name: "$by.name",
-                        // dp: "$by.dp",
-                        // dob: "$by.dob",
-                        // about: "$by.about",
                         gender: "$by.gender",
                     }
                 },

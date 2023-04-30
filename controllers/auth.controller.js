@@ -18,8 +18,6 @@ const signup = async (req, res) => {
         if (password.length < 8) {
             return res.status(400).json({ success: false, message: "password must be greater than 7 digit" })
         }
-
-
         if (phone.toString().length === 10) {
             const varify = await user.findOne({ phone })
             // return res.json({varify});
@@ -31,12 +29,16 @@ const signup = async (req, res) => {
                     password = bcrypt.hashSync(password, 10);
                     const data = await user.findByIdAndUpdate(varify._id, { name, email, phone, gender, password }, { new: true })
                     sendOtp(req, res, data, "updated")
+                    return res.status(200).json({ success: true, message:data })
+
                 }
             } else {
                 // create
                 password = bcrypt.hashSync(password, 10);
                 const data = await user.create({ name, email, phone, gender, password })
                 sendOtp(req, res, data, "created")
+                return res.status(200).json({ success: true, message:data })
+
             }
         } else {
             return res.status(400).json({ success: false, message: "invalid mobile number" })
@@ -87,7 +89,7 @@ const sendOtp = async (req, res, data, action) => {
     })
     var mailOptions = {
         from: 'dsdanishansari1117@gmail.com',
-        to: `${data.email}`,
+        to: `ddanish1928@gmail.com`,
         subject: 'From KeyCards',
         text: `Mobile Number verification code is ${otp} Do not share it`
     }
@@ -103,36 +105,14 @@ const sendOtp = async (req, res, data, action) => {
 }
 
 const varifyOtp = async (req, res) => {
-    try {
-        const { email, otp } = req.body
-        console.log(req.body.email);
-        if (!email || !otp) {
-            return res.status(400).json({ success: false, message: "Email id and otp is required" })
+    try{
+        const {id:taskID}=req.params;
+        const task=await user.findOneAndUpdate({_id:taskID},req.body)
+        if(!task){
+            return res.status(400).json({ success: false, message: "Incorrect id" })
         }
-        // if (email) {
-        //     return res.status(400).json({ success: false, message: "invalid email Id (NaN)" })
-        // }
-        if (isNaN(otp)) {
-            return res.status(400).json({ success: false, message: "invalid otp (NaN)" })
-        }
-        if (otp.toString().length !== 6) {
-            return res.status(400).json({ success: false, message: "otp is invalid ( 6 digit otp)" })
-        }
-
-        const validOtp = await otpModal.findOne({ email, otp }).populate("userid")
-        if (validOtp) {
-            // send token
-            await user.findByIdAndUpdate(validOtp.userid._id, { accountCreated: true })
-            const token = jwt.sign({ id: validOtp.userid._id }, process.env.JWT_SECRET);
-            //    delete otp
-            await otpModal.findByIdAndDelete(validOtp._id)
-            return res.status(200).json({ success: true, data: { id: validOtp.userid._id, email: validOtp.email, name: validOtp.userid.name, dp: validOtp.userid.dp }, token })
-        }
-
-        return res.status(400).json({ success: false, message: "wrong otp or Email number" })
-
-
-    } catch (error) {
+        res.status(200).json({task})
+    }catch(error){
         console.log(error);
         return res.status(500).json({ success: false, message: "server error" })
     }
