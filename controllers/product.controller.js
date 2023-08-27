@@ -1,4 +1,5 @@
 const product = require("../models/product.model")
+const mongoose = require('mongoose');
 
 
 const addProduct = async (req, res) => {
@@ -22,12 +23,12 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { id: taskID } = req.params;
-        const task = await product.findOneAndUpdate({ _id: taskID }, req.body)
-        if (!task) {
+        const { id: productID } = req.params;
+        const data = await product.findOneAndUpdate({ _id: productID }, req.body)
+        if (!data) {
             return res.status(400).json({ success: false, message: "Incorrect id" })
         }
-        res.status(200).json({ task })
+        res.status(200).json({ success: true, message: data })
     } catch (error) {
         console.log(error);
         return res.status(500).json({ success: false, message: "server error" })
@@ -37,7 +38,7 @@ const updateProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
     try {
         const products = await product.find({})
-        res.send(products);
+        res.send(products.reverse());
     } catch (error) {
         console.log(error);
         return res.status(500).json({ success: false, message: "server error" })
@@ -51,7 +52,7 @@ const getProduct = async (req, res) => {
         if (!products) {
             return res.status(400).json({ success: false, message: "Incorrect id" })
         }
-        res.send(products)
+        res.send(products.reverse())
 
     } catch (error) {
         console.log(error);
@@ -60,16 +61,39 @@ const getProduct = async (req, res) => {
 
 }
 
-const liveSearch = async (req, res) => {
-    try {
-        const { name } = req.query
-        const skip = Number(req.query.skip) || 0
 
-        const data = await user.find({ name: { $regex: '^' + name, $options: 'i' } }).select("name dp gender _id ").sort({ datetime: -1 }).skip(skip).limit(20)
-        res.status(200).json({ success: true, data })
-        console.log(data);
+const getProductById = async (req, res) => {
+    try {
+        let _id = req.query.id
+        if (!_id) {
+            return res.status(404).json({ success: false, message: "id is not provided" })
+        }
+        if (mongoose.Types.ObjectId.isValid(_id)) {
+            _id = mongoose.Types.ObjectId(_id)
+            const userInfo = await product.findOne({ _id }).select('_id companyName category logoURL productImage productLink discription comment vote')
+            if (!userInfo) {
+                return res.status(404).json({ success: false, message: 'user not found' })
+            }
+
+            return res.status(200).json({
+                success: true, data: {
+                    companyName: userInfo.companyName,
+                    _id: userInfo._id,
+                    category: userInfo.category,
+                    logoURL: userInfo.logoURL,
+                    productImage: userInfo.productImage,
+                    productLink: userInfo.productLink,
+                    discription: userInfo.discription,
+                    comment: userInfo.comment,
+                    vote: userInfo.vote,
+                }
+            })
+        } else {
+            return res.status(401).json({ success: false, message: "invalid id" })
+        }
     } catch (error) {
-        res.status(500).json({ success: false, message: "server error" })
+        console.log(error);
+        return res.status(500).json({ success: false, message: "server error" })
     }
 }
 
@@ -78,5 +102,6 @@ module.exports = {
     addProduct,
     updateProduct,
     getAllProduct,
-    getProduct
+    getProduct,
+    getProductById
 }

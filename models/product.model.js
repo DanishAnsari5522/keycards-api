@@ -24,6 +24,10 @@ const product = new mongoose.Schema({
     comment: {
         type: Array,
         default: []
+    },
+    vote:{
+        type:Number,
+        default:0
     }
 })
 

@@ -1,10 +1,6 @@
 const user = require("../models/user.model")
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
-const otpModal = require("../models/otp.model");
-const nodemaler = require("nodemailer")
-
-const springedge = require('springedge');
 
 const signup = async (req, res) => {
     try {
@@ -70,56 +66,7 @@ const login = async (req, res) => {
         return res.status(500).json({ success: false, message: "server error" })
     }
 }
-
-const sendOtp = async (req, res, data, action) => {
-    // create random otp
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    // update in db
-    const otpObj = await otpModal.updateOne({ email: data.email }, { otp, userid: data._id, email: data.email }, { upsert: true })
-    // send
-    var transport = nodemaler.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: {
-            user: 'dsdanishansari1117@gmail.com',
-            pass: 'memppgtgladvrcmv'
-        }
-    })
-    var mailOptions = {
-        from: 'dsdanishansari1117@gmail.com',
-        to: `ddanish1928@gmail.com`,
-        subject: 'From KeyCards',
-        text: `Mobile Number verification code is ${otp} Do not share it`
-    }
-    transport.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            // console.log("mail has been send", info.response);
-            return res.status(200).json({ success: true, message: "otp send" })
-
-        }
-    })
-}
-
-const varifyOtp = async (req, res) => {
-    try {
-        const { id: taskID } = req.params;
-        const task = await user.findOneAndUpdate({ _id: taskID }, req.body)
-        if (!task) {
-            return res.status(400).json({ success: false, message: "Incorrect id" })
-        }
-        res.status(200).json({ task })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "server error" })
-    }
-}
-
 module.exports = {
     signup,
     login,
-    varifyOtp
 }
